@@ -1,0 +1,5 @@
+# Exclude Visual Studio configuration from language statistics
+.vsconfig linguist-vendored
+
+# Exclude TextMesh Pro files from language statistics
+**/TextMesh?Pro/** linguist-vendored
