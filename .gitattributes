@@ -2,4 +2,4 @@
 .vsconfig linguist-vendored
 
 # Exclude TextMesh Pro files from language statistics
-**/TextMesh[[:space:]]Pro/** linguist-vendored
+"**/TextMesh Pro/**" linguist-vendored
