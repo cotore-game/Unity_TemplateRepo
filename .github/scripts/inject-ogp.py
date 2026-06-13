@@ -5,6 +5,7 @@ OGP / SNS プレビュー meta タグを Unity WebGL の index.html に注入す
 """
 
 import argparse
+import html
 import os
 import re
 import shutil
@@ -46,10 +47,10 @@ def is_lfs_pointer(path: str) -> bool:
 def build_meta_block(cfg: dict, repo_url: str, icon_copied: bool) -> str:
     """注入する meta タグブロックを組み立てる。"""
     tags = []
-    title = cfg.get("title", "")
-    description = cfg.get("description", "")
-    icon_file = cfg.get("icon_file", "")
-    theme_color = cfg.get("theme_color", "")
+    title = html.escape(cfg.get("title", ""), quote=True)
+    description = html.escape(cfg.get("description", ""), quote=True)
+    icon_file = html.escape(cfg.get("icon_file", ""), quote=True)
+    theme_color = html.escape(cfg.get("theme_color", ""), quote=True)
 
     if title:
         tags.append(f'  <meta property="og:title" content="{title}">')
