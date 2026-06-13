@@ -125,12 +125,12 @@ def main():
         print(f"Error: {args.index} not found.", file=sys.stderr)
         return 1
 
-    html = index_path.read_text(encoding="utf-8")
-    if not re.search(r"(?i)</head>", html):
+    html_text = index_path.read_text(encoding="utf-8")
+    if not re.search(r"(?i)</head>", html_text):
         print("Error: </head> tag not found in index.html", file=sys.stderr)
         return 1
 
-    patched = re.sub(r"(?i)(</head>)", block + r"\1", html, count=1)
+    patched = re.sub(r"(?i)(</head>)", block + r"\1", html_text, count=1)
 
     # バックアップを作成してから書き込み
     backup = index_path.with_suffix(".html.bak")
