@@ -20,6 +20,11 @@ on:
         required: false
         type: string
         default: 'Build'
+      caller-run-id:
+        description: 'Run ID of the caller workflow (for artifact/run links)'
+        required: false
+        type: string
+        default: ''
       installer-artifact-name:
         description: 'Installer Artifact Name (Optional)'
         required: false
@@ -70,7 +75,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts?per_page=100"
+          # caller-run-id が渡されていればそちらを優先する
+          # （workflow_call 内では github.run_id が呼び出し先自身の run になるため）
+          RUN_ID="${{ inputs.caller-run-id }}"
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="${{ github.run_id }}"
+          fi
+
+          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts?per_page=100"
           ARTIFACT_JSON=$(curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$API_URL")
 
           get_id() {
@@ -85,7 +97,7 @@ jobs:
           "
           }
 
-          BASE="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+          BASE="https://github.com/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts"
 
           for VAR in installer windows webgl; do
             case $VAR in
@@ -126,7 +138,12 @@ jobs:
               ;;
           esac
 
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          RUN_ID="${{ inputs.caller-run-id }}"
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="${{ github.run_id }}"
+          fi
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${RUN_ID}"
+          echo "run_url=${RUN_URL}" >> $GITHUB_OUTPUT
 
           {
             echo "body<<EOF"
@@ -169,5 +186,5 @@ jobs:
           avatar-url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
           embed-title: "${{ inputs.workflow-name }} - ${{ steps.prepare.outputs.label }}"
           embed-color: ${{ steps.prepare.outputs.color }}
-          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          embed-url: "${{ steps.prepare.outputs.run_url }}"
           embed-description: ${{ steps.prepare.outputs.body }}

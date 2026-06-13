@@ -300,6 +300,7 @@ jobs:
     with:
       status: "success"
       version: ${{ needs.init.outputs.version }}
+      caller-run-id: ${{ github.run_id }}
       workflow-name: "${{ needs.init.outputs.workflow_display_name }}"
       job-name: "All processes completed successfully"
       installer-artifact-name: ${{ needs.init.outputs.run_windows == 'true' && format('installer-v{0}', needs.init.outputs.version) || '' }}
@@ -319,6 +320,7 @@ jobs:
     with:
       status: "failure"
       version: ${{ needs.init.outputs.version }}
+      caller-run-id: ${{ github.run_id }}
       workflow-name: "${{ needs.init.outputs.workflow_display_name }}"
       job-name: "An error occurred"
     secrets:
@@ -335,6 +337,7 @@ jobs:
     with:
       status: "cancelled"
       version: ${{ needs.init.outputs.version }}
+      caller-run-id: ${{ github.run_id }}
       workflow-name: "${{ needs.init.outputs.workflow_display_name }}"
       job-name: "Build was cancelled"
     secrets:
